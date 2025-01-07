@@ -238,7 +238,7 @@
             color: white;
             border: none;
             padding: 10px;
-            width: 100%;
+            width: 50%;
             font-size: 1rem;
             cursor: pointer;
             border-radius: 5px;
@@ -403,7 +403,7 @@
     <div class="nav-bar">
         <ul class="navbar-right">
             <li><a href="#"><i class="fa fa-user" style="font-size:22px;color:rgb(76, 0, 255)"></i>Accounts</a></li>
-            <li><a href="#"><i class="fa fa-sign-out" style="font-size:22px;color:red"></i>Logout</a></li>
+            <li><a href="{% url 'login' %}"><i class="fa fa-sign-out" style="font-size:22px;color:red"></i>Logout</a></li>
         </ul>
 
         <ul class="navbar-left" style="font-family:cursive;font-size:x-large;">
@@ -523,7 +523,7 @@
 
         <ul class="faq-list" id="faqList">
             <li onclick="askQuestion('What is Easy Purchase Investment?')">What is Easy Purchase Investment?</li>
-            <li onclick="askQuestion('How can I invest in Easy Purchaase?')">How can I invest in Easy Purchase?</li>
+            <li onclick="askQuestion('How can I invest in Easy Purchase?')">How can I invest in Easy Purchase?</li>
             <li onclick="askQuestion('What are the benefits of investing?')">What are the benefits of investing?</li>
             <li onclick="askQuestion('How can I contact customer support?')">How can I contact customer support?</li>
             <li onclick="askQuestion('Can I get a refund or cancel my investment?')">Can I get a refund or cancel my investment?</li>
@@ -537,7 +537,7 @@
     <script>
         const faqAnswers = {
             "What is Easy Purchase Investment?": "Easy Purchase Investment is a platform that allows individuals to invest in various sustainable projects that aim to improve society and the environment.",
-            "How can I invest in Easy purchase?": "To invest in Easy Purchase, you need to create an account, deposit funds, and choose from a list of available investment opportunities.",
+            "How can I invest in Easy Purchase?": "To invest in Easy Purchase, you need to create an account, deposit funds, and choose from a list of available investment opportunities.",
             "What are the benefits of investing?": "Investing in Easy Pay allows you to contribute to projects that focus on renewable energy, education, and community development, while earning returns on your investments.",
             "How can I contact customer support?": "You can contact customer support by emailing shahirkp@gmail.com or using the live chat feature on this page.",
             "Can I get a refund or cancel my investment?": "Easy Purchase Investment has a strict no-refund and no-cancellation policy. Once an investment is made, the funds are allocated to ongoing projects and cannot be reversed. We encourage investors to thoroughly evaluate the opportunities and reach out to our team for any clarifications before committing to an investment."
@@ -602,10 +602,10 @@
                 <div class="col-md-2">
                     <h4>Quick Links</h4>
                     <ul style="list-style: none; padding: 0;">
-                        <li><a href="/privacy-policy">Privacy Policy</a></li>
-                        <li><a href="/terms-of-service">Terms of Service</a></li>
+                        <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+                        <li><a href="{% url 'terms' %}">Terms&Condition</a></li>
                         <li><a href="/faq">FAQ</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
+                        <li><a href="{% url 'contact' %}">Contact Us</a></li>
                     </ul>
                 </div>
 
