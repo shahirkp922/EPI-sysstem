@@ -11,11 +11,8 @@ import string
 from django.http import JsonResponse
 from .models import Profile
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-
-
-
-
 
 # Create your views here.
 def generate_referral_code():
@@ -87,7 +84,7 @@ def login_view(request):
             user = form.get_user()
             auth_login(request, user)
             messages.success(request, "Login successful! Welcome back!")
-            return redirect('home')  
+            return redirect('index')  
         else:
             messages.error(request, "Invalid username or password.")
     else:
@@ -96,17 +93,17 @@ def login_view(request):
     return render(request, 'login.html', {'form': form})
 
 
+@login_required
+def profile_view(request):
+    # Fetch user profile data
+    profile = request.user.profile
+    return render(request, 'profile.html', {'profile': profile})
+
+
+
 def logout_view(request):
     logout(request)
-    return redirect('login')
-
-
-
-
-
-
-
-
+    return redirect('login')  
 
 def index(request):
     dict_eve={
@@ -126,4 +123,8 @@ def contact(request):
 
 def privacy(request):
     return render(request,'privacy.html')
+    
+def refar(request):
+    return render(request,'refar.html')
+    
 

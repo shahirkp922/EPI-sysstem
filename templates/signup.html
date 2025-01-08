@@ -16,6 +16,12 @@
     document.addEventListener('DOMContentLoaded', () => {
         const form = document.querySelector('form');
         /*console.log('Form:', form);*/
+
+        if (!form) {
+            console.error('Form element not found. Ensure the form selector is correct.');
+            return;
+        }
+
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -32,6 +38,11 @@
                     method: 'POST',
                     body: formData,
                 });
+
+                // Validate response
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
                 const result = await response.json();
                 console.log('Result JSON:',result);
@@ -55,25 +66,45 @@
     });
 
     function openReferralPopup() {
-        document.getElementById('referralOverlay').style.display = 'block';
-        document.getElementById('referralPopup').style.display = 'block';
+        const overlay = document.getElementById('referralOverlay');
+        const popup = document.getElementById('referralPopup');
+
+        if (overlay && popup) {
+            overlay.style.display = 'block';
+            popup.style.display = 'block';
+        } else {
+            console.warn('Referral popup elements not found.');
+        }
     }
 
     function closeReferralPopup() {
-        document.getElementById('referralOverlay').style.display = 'none';
-        document.getElementById('referralPopup').style.display = 'none';
+        const overlay = document.getElementById('referralOverlay');
+        const popup = document.getElementById('referralPopup');
+
+        if (overlay && popup) {
+            overlay.style.display = 'none';
+            popup.style.display = 'none';
+        } else {
+            console.warn('Referral popup elements not found.');
+        }
     }
 
     function submitReferralCode() {
-        const referralCode = document.getElementById('referralCodeInput').value;
+        const referralCodeInput = document.getElementById('referralCodeInput');
+        const referralCode = referralCodeInput ? referralCodeInput.value.trim() : '';
 
-        if (referralCode.trim() === '') {
-        alert('Please enter a referral code or click skip.');
-        return;
+        if (referralCode === '') {
+            alert('Please enter a referral code or click skip.');
+            return;
         }
 
         // Attach the referral code to the form as a hidden input
         const form = document.querySelector('form');
+        if (!form) {
+            console.error('Form element not found. Ensure the form selector is correct.');
+            return;
+        }
+
         let referredByInput = document.querySelector('input[name="referred_by"]');
 
         if (!referredByInput) {
@@ -87,13 +118,17 @@
 
         alert(`Referral code ${referralCode} submitted!`);
         closeReferralPopup();
+
+           // Redirect to the home page
+           window.location.href = '/';
     }
-
-
         function skipReferral() {
             closeReferralPopup();
+
+            // Redirect to the home page
+            window.location.href = '/';
         }
-        
+                     
 </script>
 
 <style>
@@ -196,7 +231,7 @@
 
         .form-group input[type="file"]{
             flex: 2;
-            padding: 5px;
+            padding: 2px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1em;
@@ -216,7 +251,7 @@
             width: 100%;
             padding: 2px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 2px;
             font-size: 1em;
             color: #ffffff;
         }
@@ -228,6 +263,17 @@
 
         .form-check-input {
             margin-right: 10px;
+        }
+
+        .terms-link {
+            color: #007bff; /* Blue color */
+            text-decoration: none; /* Remove underline */
+            font-size: 12px; /* Set font size */
+        }
+
+        .terms-link:hover {
+            text-decoration: underline; /* Add underline on hover */
+            color: #0056b3; /* Darker blue on hover */
         }
 
         .btn {
@@ -367,6 +413,10 @@
                     {{ form.accept_terms }}
                     {{ form.accept_terms.label_tag }}
                 </div>
+
+                <div>
+                    <a href="{% url 'terms' %}" target="_blank" class="terms-link">(Read our Terms and Conditions)</a>
+                </div>
                 
                 <button type="submit" class="btn">Sign Up</button>
             </form>
@@ -380,28 +430,12 @@
 <!-- Referral Popup -->
 <div id="referralOverlay" class="overlay" style="display:none;"></div>
 <div id="referralPopup" class="popup" style="display:none;">
-    <h2>Signup Successful!</h2>
-    <p>Your referral code is: <strong id="referralCode"></strong></p>
-    <p>Were you referred by someone? Enter their referral code below:</p>
+    <h2>Signup Successful!</h2><br>
+    <h5>Your referral code is: <strong id="Who_referred_by"></strong></h5><br>
+    <h5>Were you referred by someone? Enter their referral code below:</h5>
     <input type="text" id="referralCodeInput" placeholder="Referral Code" class="form-control">
     <button onclick="submitReferralCode()">Submit</button>
     <button onclick="skipReferral()" class="close-btn">Skip</button>
 </div>
-
-    <!--div class="overlay" id="overlay"></div>
-    <div class="popup" id="popup">
-        <h3>Your Referral Code</h3>
-        <p>Your referral code is: <span id="referralCode">ABC123</span></p>
-        <button class="close-btn" onclick="closePopup()">Close</button>
-    </div-->
-
-    <!-- Popup for 'Referred By' Information -->
-    <!--div class="overlay" id="referralOverlay" style="display: none;"></div>
-    <div class="popup referral-popup" id="referralPopup" style="display: none;">
-        <h3>Were you referred by someone?</h3>
-        <input type="text" id="referralCodeInput" placeholder="Enter Referral Code (Optional)" />
-        <button onclick="continueWithReferral()">Continue</button>
-        <button onclick="skipReferral()">Skip</button>
-    </div-->
 </body>
 </html>
