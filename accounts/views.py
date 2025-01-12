@@ -1,20 +1,40 @@
-from django.shortcuts import render
-from .models import Post
+from django.shortcuts import get_object_or_404, render
+from .models import Post, Referral, Profile 
 from django.shortcuts import render,redirect
-from .forms import SignupForm
+from .forms import ProductSchemeForm, SignupForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.contrib import messages
-#from django.core.files.storage import default_storage
 import random
 import string
 from django.http import JsonResponse
-from .models import Profile
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from decimal import Decimal
+from .models import ProductScheme,Services
+from datetime import datetime, timedelta
 
-# Create your views here.
+# View to handle Product Scheme Management
+def product_scheme_manage(request):
+    if request.method == 'POST':
+        form = ProductSchemeForm(request.POST)
+        if form.is_valid():
+            scheme = form.save(commit=False)
+            scheme.start_date = datetime.now()
+            scheme.end_date = scheme.start_date + timedelta(days=form.cleaned_data['days'])
+            scheme.save()
+            return redirect('payment_screen')
+        else:
+            print(f"Form errors: {form.errors}")  # Debugging line
+    else:
+        form = ProductSchemeForm()
+    
+    return render(request, 'product_scheme_manage.html', {'form': form})
+
+def payment_screen(request):
+    return render(request, 'payment.html')
+
 def generate_referral_code():
     """Generate a unique 8-character referral code."""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -33,7 +53,16 @@ def signup_view(request):
             
             # Create profile with referral code and save KYC details
             referral_code = generate_referral_code()
-            print(f"Generated referral code: {referral_code}")  # Debug message
+            referred_by = request.POST.get('referred_by', None)
+
+            referred_by_profile = None
+            if referred_by:
+                try:
+                    referred_by_profile = Profile.objects.get(referral_code=referred_by)
+                except Profile.DoesNotExist:
+                    referred_by_profile = None
+
+            #print(f"Generated referral code: {referral_code}")  # Debug message
             profile = Profile.objects.create(
                 user=user,
                 referral_code=referral_code,
@@ -44,29 +73,24 @@ def signup_view(request):
                 bank_passbook=form.cleaned_data.get('bank_passbook'),
             )
 
+            # Track referral and rewards
+            if referred_by_profile:
+                referred_by_profile.referrals_made += 1
+                referred_by_profile.rewards_earned += 10.00  # Example reward
+                referred_by_profile.save()
+                Referral.objects.create(referred_by=referred_by_profile, referred_user=user)
+
             auth_login(request, user)
             messages.success(request, "Signup successful! Welcome aboard!")
             return JsonResponse({'success': True, 'referral_code': referral_code})
         
-            #auth_login(request, user)
-            #messages.success(request, "Signup successful! Welcome aboard!")
-            #return JsonResponse({
-                #'success': True,
-                #'referral_code': referral_code,
-            #})
-            
         else:
             # Process form errors and send them as JSON response
             errors = {
                 field: [error['message'] for error in error_list] 
                 for field, error_list in form.errors.get_json_data().items()
             }
-            return JsonResponse({'success': False, 'errors': errors})
-
-        #else:
-            # Process errors into a user-friendly format
-            #errors = {field: error.get_json_data() for field, error in form.errors.items()}
-            #return JsonResponse({'success': False, 'errors': errors})
+            return JsonResponse({'success': True, 'referral_code': referral_code})
 
     else:
         form = SignupForm()
@@ -92,7 +116,6 @@ def login_view(request):
         
     return render(request, 'login.html', {'form': form})
 
-
 @login_required
 def profile_view(request):
     # Fetch user profile data
@@ -100,10 +123,9 @@ def profile_view(request):
     return render(request, 'profile.html', {'profile': profile})
 
 
-
 def logout_view(request):
     logout(request)
-    return redirect('login')  
+    return redirect('login')
 
 def index(request):
     dict_eve={
@@ -126,5 +148,67 @@ def privacy(request):
     
 def refar(request):
     return render(request,'refar.html')
-    
 
+
+# @login_required
+# def referral_view(request):
+#     if not request.user.is_authenticated:
+#         return redirect('login')
+
+#     user_profile = Profile.objects.get(user=request.user)
+
+#     # Generate referral link
+#     if not user_profile.referral_code:
+#         user_profile.referral_code = generate_referral_code()
+#         user_profile.save()
+
+#     # Fetch referral details
+#     referrals = Referral.objects.filter(referred_by=user_profile)
+#     referral_count = referrals.count()
+#     total_rewards = user_profile.rewards_earned
+
+#     referral_link = f"https://example.com/referral/{user_profile.referral_code}"
+
+#     context = {
+#         'referral_code': user_profile.referral_code,
+#         'referral_link': referral_link,
+#         'referral_count': referral_count,
+#         'total_rewards': total_rewards,
+#     }
+#     return render(request, 'refar.html', context)
+
+def services_view(request):
+    services = Services.objects.all()
+    return render(request, 'services.html' , {'services': services})
+
+@login_required
+def referral_view(request):
+    user_profile = Profile.objects.get(user=request.user)
+
+    # Generate referral code if not already set
+    if not user_profile.referral_code:
+        user_name = request.user.first_name or "USER"  # Fallback to 'USER' if the name is empty
+        user_profile.referral_code = generate_referral_code(user_name)
+        user_profile.save()
+
+    # Fetch referral details
+    referrals = Referral.objects.filter(referred_by=user_profile)
+    referral_count = referrals.count()
+    total_rewards = user_profile.rewards_earned
+
+    # Collect referred persons' details
+    referred_persons = [
+        {
+            'name': referral.referred_user.username,
+            'timestamp': referral.timestamp,
+        }
+        for referral in referrals
+    ]
+
+    context = {
+        'referral_code': user_profile.referral_code,
+        'referral_count': referral_count,
+        'total_rewards': total_rewards,
+        'referred_persons': referred_persons,
+    }
+    return render(request, 'refar.html', context)

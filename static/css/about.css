@@ -1,0 +1,137 @@
+body {
+    background-image: url('/static/bg img3.avif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}   
+header {
+    background-image: url(''); /* Add your background image here */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+}
+header img {
+    position: absolute; /* Position the logo at the top-left corner */
+    top: 20px; /* Distance from the top */
+    left: 20px; /* Distance from the left */
+    max-width: 150px; /* Limit the width of the logo */
+    height: auto;
+}
+header h1 {
+    font-size: 3rem; /* Larger text for the header */
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+.container {
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white background */
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+h2 {
+    color: #333;
+}
+p {
+    color: #555;
+    margin-bottom: 20px;
+}
+.team {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+.team-member {
+    text-align: center;
+    flex: 1 1 calc(25% - 40px);
+    max-width: 250px;
+}
+.team-member img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Icons and new about section */
+.about-section {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 40px;
+}
+.about-box {
+    text-align: center;
+    width: 30%;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+}
+.about-box i {
+    font-size: 40px;
+    color: #333;
+    margin-bottom: 20px;
+}
+.about-box h3 {
+    margin-top: 10px;
+}
+
+/* Navbar */
+.nav-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 20px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+}
+
+.nav-bar .menu-toggle {
+    font-size: 30px;
+    cursor: pointer;
+    color: #fff;
+    padding: 10px;
+}
+
+.nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    padding: 20px;
+    width: 200px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.nav-links a:hover {
+    color: #ddd;
+}
+
+.nav-links.show {
+    display: flex;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+}
